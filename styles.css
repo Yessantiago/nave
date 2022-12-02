@@ -1,6 +1,7 @@
-
 body {
-    background-image:url("img/espacio.png");
-    background-repeat: no-repeat;
-    background-size: cover;
+  background-image: url("img/espacio.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
 }

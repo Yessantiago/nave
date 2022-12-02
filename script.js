@@ -1,19 +1,21 @@
 /* **** Examen 1 *************************
-* Nombre: Yessica Fabiola Santiago Valdes
-* Matricula: 2173011484
-* Fecha: 25/11/2022 **********************/
+ * Nombre: Yessica Fabiola Santiago Valdes
+ * Matricula: 2173011484
+ * Fecha: 25/11/2022 **********************/
 
 const CREACION = 100;
 const PRECARGA = 200;
 const INICIO = 300;
 
 class NaveEspacial {
-  constructor(x, y, imagen, velocidad = -1) {
+  constructor(x, y, imagen, velocidad = -1, velocidadY = -1) {
     this.x = x;
     this.y = y;
     this.imagen = imagen;
 
     this.velocidad = velocidad;
+    this.velocidadY = velocidadY;
+
     this.gdireccion = null;
     this.sdireccion = null;
 
@@ -29,6 +31,9 @@ class NaveEspacial {
   getVelocidad() {
     return this.velocidad;
   }
+  getVelocidadY() {
+    return this.velocidadY;
+  }
   setX(x) {
     this.x = x;
   }
@@ -37,6 +42,9 @@ class NaveEspacial {
   }
   setVelocidad(velocidad) {
     this.velocidad = velocidad;
+  }
+  setVelocidadY(velocidad) {
+    this.velocidadY = velocidad;
   }
   setImagen(imagen) {
     this.imagen = imagen;
@@ -106,7 +114,7 @@ function Animacion() {
     this.imagenes["nave5"].name = "nave5";
     this.imagenes["nave5"].src = "img/nave.png";
   };
-  // navecitas 
+  // navecitas
   this.actualizacion = function () {
     // context.clearRect(x,y,width,height);
     this.auxcontexto.clearRect(0, 0, this.canvas.width, this.canvas.height); //limpia el canvas de naves
@@ -131,7 +139,9 @@ function Animacion() {
       this.canvas.height
     );
 
+    // TODO: Aqui va lo del desplazamiento de las naves hacia la nodriza
     this.naveNodriza = this.validaPosicionNaveNodriza(this.naveNodriza);
+
     this.nave = this.validaPosicionX(this.nave);
     this.nave2 = this.validaPosicionY(this.nave2);
     this.nave3 = this.validaPosicionX(this.nave3);
@@ -140,32 +150,23 @@ function Animacion() {
   };
 
   this.validaPosicionNaveNodriza = function (nave) {
-    let direccionX = nave.getVelocidad();
-    let direccionY = nave.getVelocidad();
-
-    console.log(`COORDENADAS [${nave.getX()},${nave.getY()}]`);
-
-    if (nave.getX() > this.canvas.width - 500 || nave.getX() < 0) {
-      direccionX = -1 * direccionX;
-
-      if (nave.getY() < 0 || nave.getY() > this.canvas.height - 245)
-        direccionY = -1 * direccionY;
-    } else {
-      if (nave.getY() < 0 || nave.getY() > this.canvas.height - 245) {
-        direccionY = -1 * direccionY;
-
-        if (nave.getX() > this.canvas.width - 500 || nave.getX() < 0)
-          direccionX = -1 * direccionX;
-      }
+    // TODO: validar cuando va recto hacia arriba
+    if (nave.getX() > this.canvas.width - nave.imagen.width || nave.getX() < 0) {
+      nave.setVelocidad(-1 * nave.getVelocidad());
     }
-    nave.sdireccion(nave.gdireccion() + direccionX);
-    nave.sdireccionY(nave.gdireccionY() + direccionY);
+
+    if (nave.getY() < 0 || nave.getY() > this.canvas.height - nave.imagen.height) {
+      nave.setVelocidadY(-1 * nave.getVelocidadY());
+    }
+
+    nave.sdireccion(nave.gdireccion() + nave.getVelocidad());
+    nave.sdireccionY(nave.gdireccionY() + nave.getVelocidadY());
 
     return nave;
   };
 
-  this.validaPosicionX = function (nave, widthDiferencia = 100) {
-    if (nave.getX() > this.canvas.width - widthDiferencia || nave.getX() < 0)
+  this.validaPosicionX = function (nave) {
+    if (nave.getX() > this.canvas.width - nave.imagen.width || nave.getX() < 0)
       nave.setVelocidad(-1 * nave.getVelocidad());
 
     // sdireccion -> setX y gdireccion -> getX
@@ -174,8 +175,8 @@ function Animacion() {
     return nave;
   };
 
-  this.validaPosicionY = function (nave, heightDiferencia = 50) {
-    if (nave.getY() > this.canvas.height - heightDiferencia || nave.getY() < 0)
+  this.validaPosicionY = function (nave) {
+    if (nave.getY() > this.canvas.height - nave.imagen.height || nave.getY() < 0)
       nave.setVelocidad(-1 * nave.getVelocidad());
 
     nave.sdireccion(nave.gdireccion() + nave.getVelocidad());
@@ -187,15 +188,7 @@ function Animacion() {
     if (e.key == "r") {
       objeto.naveNodriza.setVelocidad(0);
       let coordenadaXN = objeto.naveNodriza.getX();
-      console.log(
-        "🚀 ~ file: script.js ~ line 186 ~ Animacion ~ coordenadaXN",
-        coordenadaXN
-      );
       let coordenadaX = objeto.nave2.getX();
-      console.log(
-        "🚀 ~ file: script.js ~ line 188 ~ Animacion ~ coordenadaX",
-        coordenadaX
-      );
 
       objeto.nave2.setX(coordenadaXN);
       if (coordenadaX == coordenadaXN) objeto.nave2.setVelocidad(0);
@@ -252,17 +245,7 @@ function Animacion() {
         if (objeto.imagenes[i].complete != true) imagenesCargadas = false;
 
       if (imagenesCargadas == true) {
-        objeto.naveNodriza = new NaveEspacial(
-          100,
-          150,
-          objeto.imagenes["naveNodriza"],
-          2
-        );
-
-        console.log(
-          "🚀 ~ file: script.js ~ line 250 ~ Animacion ~ objeto.imagenes",
-          objeto.imagenes
-        );
+        objeto.naveNodriza = new NaveEspacial(100, 150, objeto.imagenes["naveNodriza"], 40);
 
         objeto.naveNodriza.gdireccion = objeto.naveNodriza.getX; //gdireccion-get-  movimiento inicial
         objeto.naveNodriza.sdireccion = objeto.naveNodriza.setX;
